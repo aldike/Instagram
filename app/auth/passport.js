@@ -2,12 +2,9 @@ const passport = require('passport');
 const passportJWT = require('passport-jwt');
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
-const crypto = require('crypto');
+const secretKey = require('../../config/crypto');
 
 const User = require('./User');
-
-// Generate a secure secret key using crypto
-const secretKey = crypto.randomBytes(32).toString('hex');
 
 const jwtOptions = {
   jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),

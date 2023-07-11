@@ -7,7 +7,7 @@ const app = express();
 require('./app/auth/passport');
 
 app.use(logger('dev'));
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 // app.use(upload.any());
 app.use(passport.initialize());

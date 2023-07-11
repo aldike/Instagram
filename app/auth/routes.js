@@ -2,9 +2,6 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const {sendVerificationEmail, verifyCode, loginUser, createUsernamePassword} = require('./controllers')
-require('../auth/passport');
-
-router.use(passport.authenticate('jwt', { session: false }));
 
 router.post('/api/auth/sendmail', sendVerificationEmail)
 router.post('/api/auth/verifycode', verifyCode)

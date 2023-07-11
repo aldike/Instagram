@@ -5,7 +5,7 @@ const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: 'shakhanov90@gmail.com',
-    pass: 'cyseubmramkxefhz',
+    pass: 'uvmtffgsswabdsfg',
   },
 });
 
@@ -17,7 +17,6 @@ function sendEmail(to, subject, text){
     subject: subject,
     text: text,
   };
-
   // Отправка email
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
