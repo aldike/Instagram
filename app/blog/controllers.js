@@ -1,15 +1,14 @@
 const Post = require('./models/Post')
 
 const createPost = async (req, res) => {
-  
   try {
     // Assuming you have an authenticated user object in req.user
-    const userId = req.user.id;
+    const creatorId = req.user.id; // Use "creatorId" instead of "userId"
     const { description, media, creation_date } = req.body;
 
     // Create a new post with the extracted creatorID
     const post = await Post.create({
-      creatorId: userId,
+      creatorId: creatorId, // Set the creatorId field
       description: description,
       media: media,
       creation_date: creation_date,
