@@ -1,17 +1,17 @@
 const express = require('express');
 const logger = require('morgan');
 const passport = require('./app/auth/passport');
-// const multer = require('multer');
-// const upload = multer();
 const app = express();
 require('./app/auth/passport');
 
 app.use(logger('dev'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-// app.use(upload.any());
 app.use(passport.initialize());
+
 app.use(require('./app/auth/routes'))
+app.use(require('./app/region/routes'))
+app.use(require('./app/blog/routes'))
 
 
 app.listen(8000, () =>{
