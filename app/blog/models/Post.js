@@ -5,7 +5,7 @@ const User = require("../../auth/User");
 const Commentary = require('./Commentary');
 
 const Post = sequelize.define('Post', {
-  creatorId: {
+  creatorID: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
@@ -17,10 +17,11 @@ const Post = sequelize.define('Post', {
     type: DataTypes.DATE,
     allowNull: false,
   },
-
 });
 
-ost.belongsTo(User, { foreignKey: 'creatorId' });
-Post.hasMany(Commentary, { foreignKey: 'postId' });
+Post.associate = (models) => {
+  Post.belongsTo(models.User, { foreignKey: 'creatorID' });
+  Post.hasMany(models.Commentary, { foreignKey: 'postId' });
+};
 
 module.exports = Post;

@@ -8,6 +8,7 @@ const createPost = async (req, res) => {
       const post = await Post.create({
         creatorId: req.user.id,
         description: description,
+        media: media,
         creation_date: create_date,
       });
   

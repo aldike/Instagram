@@ -2,7 +2,6 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../../../config/db');
 
 const User = require("../../auth/User");
-const Post = require('./Post');
 
 const Commentary = sequelize.define('Commentary', {
   authorId: {
@@ -20,7 +19,8 @@ const Commentary = sequelize.define('Commentary', {
 
 });
 
-Commentary.belongsTo(User, { foreignKey: 'authorId'});
-Commentary.belongsTo(Post, { foreignKey: 'postId'});
-
+Commentary.associate = (models) => {
+  Commentary.belongsTo(models.User, { foreignKey: 'authorID' });
+  Commentary.belongsTo(models.Post, { foreignKey: 'postId' });
+};
 module.exports = Commentary;
