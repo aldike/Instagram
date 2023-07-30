@@ -1,23 +1,26 @@
 const Post = require('./models/Post')
-const City = require('../region/City')
-const Country = require('../region/Country')
 
 const createPost = async (req, res) => {
-    try {
-      const { description, media, create_date } = req.body;
-      const post = await Post.create({
-        creatorId: req.user.id,
-        description: description,
-        media: media,
-        creation_date: create_date,
-      });
   
-      res.status(200).send(post);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'An error occurred while creating the post' });
-    }
-  };
+  try {
+    // Assuming you have an authenticated user object in req.user
+    const userId = req.user.id;
+    const { description, media, creation_date } = req.body;
+
+    // Create a new post with the extracted creatorID
+    const post = await Post.create({
+      creatorId: userId,
+      description: description,
+      media: media,
+      creation_date: creation_date,
+    });
+
+    res.status(201).json(post);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to create post' });
+  }
+};
 
 const getMyPosts = async (req, res) =>{
     const posts = await Post.findAll({where: {userId: req.user.id}})

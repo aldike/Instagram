@@ -21,7 +21,7 @@ passport.use(
         done(null, false);
       }
     } catch (error) {
-      done(error, false);
+      done(error);
     }
   })
 );
