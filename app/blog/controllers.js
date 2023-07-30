@@ -2,16 +2,21 @@ const Post = require('./models/Post')
 const City = require('../region/City')
 const Country = require('../region/Country')
 
-const createPost = async (req, res) =>{
-    const post = await Post.create({
-        userId: req.user.id,
-        description: req.body.description,
-        media: req.body.media,
-        create_date: req.body.create_date
-    })
-
-    res.status(200).send(post);
-}
+const createPost = async (req, res) => {
+    try {
+      const { description, media, create_date } = req.body;
+      const post = await Post.create({
+        creatorId: req.user.id,
+        description: description,
+        creation_date: create_date,
+      });
+  
+      res.status(200).send(post);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'An error occurred while creating the post' });
+    }
+  };
 
 const getMyPosts = async (req, res) =>{
     const posts = await Post.findAll({where: {userId: req.user.id}})

@@ -5,7 +5,7 @@ const User = require("../../auth/User");
 const Commentary = require('./Commentary');
 
 const Post = sequelize.define('Post', {
-  creatorID: {
+  creatorId: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
@@ -20,6 +20,7 @@ const Post = sequelize.define('Post', {
 
 });
 
-Post.belongsTo(User, {foreignKey: 'userId'});
-Post.hasMany(Commentary, {foreignKey: 'postId'})
+ost.belongsTo(User, { foreignKey: 'creatorId' });
+Post.hasMany(Commentary, { foreignKey: 'postId' });
+
 module.exports = Post;

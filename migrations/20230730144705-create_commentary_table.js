@@ -8,7 +8,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      authorID: {
+      authorId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {

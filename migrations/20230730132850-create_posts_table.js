@@ -9,7 +9,7 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true,
       },
-      creatorID: {
+      creatorId: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
