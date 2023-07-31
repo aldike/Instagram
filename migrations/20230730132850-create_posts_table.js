@@ -9,10 +9,6 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true,
       },
-      creatorId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
       description: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -21,7 +17,7 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: false,
       },
-      userId: {
+      creatorId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {

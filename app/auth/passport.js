@@ -2,13 +2,12 @@ const passport = require('passport');
 const passportJWT = require('passport-jwt');
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
-const secretKey = require('../../config/crypto');
 
 const User = require('./User');
 
 const jwtOptions = {
   jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-  secretOrKey: secretKey,
+  secretOrKey: 'фцывфцвапуы',
 };
 
 passport.use(

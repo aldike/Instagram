@@ -15,5 +15,5 @@ const MediaFile = sequelize.define('MediaFile', {
 });
 
 MediaFile.belongsTo(Post, {foreignKey: 'postId'});
-Post.hasMany(MediaFile, {foreignKey: 'postId'})
+
 module.exports = MediaFile;

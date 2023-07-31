@@ -4,7 +4,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const AuthCode = require('./AuthCode')
 const User = require('./User')
-const secretKey = require('../../config/crypto');
 const passport = require('../auth/passport');
 
 const sendVerificationEmail = async (req, res) => {
@@ -49,12 +48,11 @@ const verifyCode = async (req, res) => {
 
     if (!user) {
       user = await User.create({ email, username: undefined, password: undefined });
-      const token = jwt.sign({ id: user.id, email: user.email }, secretKey, { expiresIn: 24 * 60 * 60 * 365 });
-      console.log("🚀 ~ file: controllers.js:53 ~ verifyCode ~ token:", token)
-      return res.status(200).json({ message: 'User created successfully' });
-    } else {
-      return res.status(200).json({ message: 'User already exists' });
+
     }
+    const token = jwt.sign({ id: user.id, email: user.email }, 'фцывфцвапуы', { expiresIn: 24 * 60 * 60 * 365 });
+    res.status(200).send(token)
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'An error occurred while verifying the code' });
