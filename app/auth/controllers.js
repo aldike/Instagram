@@ -1,5 +1,4 @@
 const sendEmail = require('../utils/sendMail')
-const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const AuthCode = require('./AuthCode')
@@ -114,9 +113,35 @@ const loginUser = async (req, res) => {
     res.status(200).json({ prompt: 'Authorization successful' });
   };
 
+  const editUser = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { full_name, email, phone, username} = req.body;
+
+    await User.update(
+      {
+        full_name: full_name,
+        email:  email,
+        phone: phone,
+        username: username
+      },
+      {
+        where: {
+          id: userId,
+        },
+      }
+    );
+
+    res.status(200).end();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to update user credentials' });
+  }
+};
 module.exports = {
     sendVerificationEmail,
     verifyCode,
     createUsernamePassword,
-    loginUser
+    loginUser,
+    editUser
 }
