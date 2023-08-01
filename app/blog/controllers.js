@@ -2,13 +2,11 @@ const Post = require('./models/Post')
 
 const createPost = async (req, res) => {
   try {
-    // Assuming you have an authenticated user object in req.user
     const creatorId = req.user.id; // Use "creatorId" instead of "userId"
     const { description, media, creation_date } = req.body;
 
-    // Create a new post with the extracted creatorID
     const post = await Post.create({
-      creatorId: creatorId, // Set the creatorId field
+      creatorId: creatorId,
       description: description,
       media: media,
       creation_date: creation_date,
@@ -21,25 +19,35 @@ const createPost = async (req, res) => {
   }
 };
 
-const getMyPosts = async (req, res) =>{
-    const posts = await Post.findAll({where: {userId: req.user.id}})
-    res.status(200).send(posts)
-}
-const getPost = async (req, res) =>{
-    const post = await Post.findByPk(req.params.id, {
+const getMyPosts = async (req, res) => {
+  try {
+    const myPosts = await Post.findAll({ where: { creatorId: req.user.id } });
+    res.status(200).send(myPosts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to get posts' });
+  }
+};
 
-    })
+
+const getAllPosts = async (req, res) =>{
+  const posts = await Post.findAll()
+  res.status(200).send(posts)
+}
+
+const getPost = async (req, res) =>{
+    const post = await Post.findByPk(req.params.id)
     res.status(200).send(post)
 }
 
-// const deleteResume = async (req, res) =>{
-//     const data = await Resume.destroy({
-//         where: {
-//             id: req.params.id
-//         }
-//     })
-//     res.status(200).end()
-// }
+const deletePost = async (req, res) =>{
+    const data = await Post.destroy({
+        where: {
+            id: req.params.id
+        }
+    })
+    res.status(200).end()
+}
 
 // const editResume = async (req, res) =>{
 //     await Resume.update({
@@ -136,5 +144,7 @@ const getPost = async (req, res) =>{
 module.exports = {
     createPost,
     getMyPosts,
+    getAllPosts,
     getPost,
+    deletePost
 }
