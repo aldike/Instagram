@@ -2,7 +2,6 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../../../config/db');
 const User = require('../../auth/User');
 const Like = require('./Like')
-const MediaFile = require('./MediaFile');
 
 const Story = sequelize.define('Story', {
   title: {
