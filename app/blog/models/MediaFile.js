@@ -7,7 +7,7 @@ const MediaFile = sequelize.define('MediaFile', {
   link: {
     type: DataTypes.STRING,
     allowNull: false,
-  }
+  },
 });
 
 MediaFile.belongsTo(Post, {foreignKey: 'postId'});

@@ -16,8 +16,9 @@ const Story = sequelize.define('Story', {
 });
 
 Story.belongsTo(User, { foreignKey: 'creatorId' });
-
-Story.hasMany(MediaFile, { foreignKey: 'storyId' });
 Story.hasMany(Like, { foreignKey: 'storyId' });
+
+const MediaFile = require('./MediaFile');
+Story.hasMany(MediaFile, { foreignKey: 'storyId' });
 
 module.exports = Story;
