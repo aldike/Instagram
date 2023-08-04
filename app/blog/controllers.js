@@ -1,6 +1,6 @@
 const Post = require('./models/Post')
 const MediaFile = require('./models/MediaFile');
-
+const Story = require('./models/Story')
 const createPost = async (req, res) => {
   try {
     const creatorId = req.user.id; // Use "creatorId" instead of "userId"
@@ -91,11 +91,65 @@ const editPost = async (req, res) => {
   }
 };
 
+const createStory = async (req, res) => {
+  try {
+    const creatorId = req.user.id;
+    const { title, media} = req.body;
+
+    // Calculate the expiration time (24 hours from now)
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 24);
+
+    const story = await Story.create({
+      creatorId: creatorId,
+      title: title,
+      expiresAt: expiresAt,
+    });
+
+    await MediaFile.create({
+      storyId: story.id,
+      link: media,
+    });
+
+    res.status(201).json(story);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to create story' });
+  }
+};
+const deleteStory = async (req, res) =>{
+  const data = await Story.destroy({
+      where: {
+          id: req.params.id
+      }
+  })
+  res.status(200).end()
+}
+
+const getUserStories = async (req, res) => {
+  try {
+    const userStories = await Story.findAll({ where: { creatorId: req.params.id } });
+    
+    // Create an array of storyIds from the userStories array
+    const storyIds = userStories.map(story => story.id);
+
+    // Use the array of storyIds in the query to get the corresponding media files
+    const userStoryMedia = await MediaFile.findAll({ where: { storyId: storyIds } });
+    res.status(200).json({ userStories, userStoryMedia });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to get users stories' });
+  }
+};
+
 module.exports = {
     createPost,
     getMyPosts,
     getAllPosts,
     getPost,
     deletePost,
-    editPost
+    editPost,
+    createStory,
+    deleteStory,
+    getUserStories
 }

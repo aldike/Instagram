@@ -49,7 +49,7 @@ const verifyCode = async (req, res) => {
       user = await User.create({ email, username: undefined, password: undefined });
 
     }
-    const token = jwt.sign({ id: user.id, email: user.email }, 'фцывфцвапуы', { expiresIn: 24 * 60 * 60 * 365 });
+    const token = jwt.sign({ id: user.id, email: user.email }, 'mySecret', { expiresIn: 24 * 60 * 60 * 365 });
     res.status(200).send(token)
 
   } catch (error) {

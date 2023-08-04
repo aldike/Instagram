@@ -13,8 +13,8 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      content: {
-        type: Sequelize.TEXT,
+      expiresAt: {
+        type: Sequelize.DATE,
         allowNull: false,
       },
       creatorId: {
