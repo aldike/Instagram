@@ -1,14 +1,15 @@
 'use strict';
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Commentaries', {
+    await queryInterface.createTable('Follows', {
       id: {
+        type: Sequelize.INTEGER,
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        autoIncrement: true,
       },
-      authorId: {
+      followingUserId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
@@ -18,27 +19,28 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
-      commentary: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      creation_date: {
-        type: Sequelize.DATE,
-        allowNull: false,
-      },
-      postId: {
+      followedByUserId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'Posts',
+          model: 'Users',
           key: 'id',
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
-      }
+      },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
     });
   },
+
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Commentaries');
-  }
+    await queryInterface.dropTable('Follows');
+  },
 };

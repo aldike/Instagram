@@ -2,16 +2,12 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('MediaFiles', {
+    await queryInterface.createTable('Likes', {
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         primaryKey: true,
         autoIncrement: true,
-      },
-      link: {
-        type: Sequelize.STRING,
-        allowNull: false,
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -20,6 +16,16 @@ module.exports = {
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
+      },
+      creatorId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       postId: {
         type: Sequelize.INTEGER,
@@ -41,10 +47,20 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
+      commentaryId: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'Commentaries',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
     });
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('MediaFiles');
+    await queryInterface.dropTable('Likes');
   },
 };

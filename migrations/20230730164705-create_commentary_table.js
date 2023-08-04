@@ -2,22 +2,32 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Posts', {
+    await queryInterface.createTable('Commentaries', {
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         primaryKey: true,
         autoIncrement: true,
       },
-      description: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      creatorId: {
+      authorId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
           model: 'Users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
+      commentary: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      postId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Posts',
           key: 'id',
         },
         onUpdate: 'CASCADE',
@@ -32,9 +42,14 @@ module.exports = {
         allowNull: false,
       },
     });
+
+    // Create an index for the foreign key
+    await queryInterface.addIndex('Commentaries', ['authorId']);
+    await queryInterface.addIndex('Commentaries', ['postId']);
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Posts');
+    // Remove the table
+    await queryInterface.dropTable('Commentaries');
   },
 };

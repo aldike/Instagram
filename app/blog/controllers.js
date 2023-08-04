@@ -34,7 +34,6 @@ const getMyPosts = async (req, res) => {
   }
 };
 
-
 const getAllPosts = async (req, res) =>{
   const posts = await Post.findAll()
   res.status(200).send(posts)

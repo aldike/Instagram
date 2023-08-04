@@ -1,7 +1,9 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../../config/db');
 
-const User = require("../../auth/User");
+const Post = require('./Post');
+const Like = require('./Like');
+const User = require('./User');
 
 const Commentary = sequelize.define('Commentary', {
   authorId: {
@@ -12,15 +14,11 @@ const Commentary = sequelize.define('Commentary', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  creation_date: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
-
 });
 
-Commentary.associate = (models) => {
-  Commentary.belongsTo(models.User, { foreignKey: 'authorID' });
-  Commentary.belongsTo(models.Post, { foreignKey: 'postId' });
-};
+Commentary.belongsTo(User, { foreignKey: 'userId' });
+
+Commentary.belongsTo(Post, { foreignKey: 'postId' });
+Commentary.hasMany(Like, { foreignKey: 'commentaryId' });
+
 module.exports = Commentary;
