@@ -152,6 +152,7 @@ const writeCommentary = async (req, res) => {
     const comment = await Commentary.create({
       authorId: authorId,
       commentary: commentary,
+      postId: req.params.id
     });
 
     res.status(201).json(comment);
@@ -160,7 +161,19 @@ const writeCommentary = async (req, res) => {
     res.status(500).json({ error: 'Failed to write commentary' });
   }
 };
-
+const deleteCommentary = async (req, res) =>{
+  const data = await Commentary.destroy({
+      where: {
+          id: req.params.id
+      }
+  })
+  res.status(200).end()
+}
+const getCommentsByPostId = async (req, res) =>{
+  const post = await Post.findByPk(req.params.id)
+  const comments = await Commentary.findAll({where: {postId: post.id}})
+  res.status(200).send(comments)
+}
 module.exports = {
     createPost,
     getMyPosts,
@@ -171,5 +184,7 @@ module.exports = {
     createStory,
     deleteStory,
     getUserStories,
-    writeCommentary
+    writeCommentary,
+    deleteCommentary,
+    getCommentsByPostId
 }

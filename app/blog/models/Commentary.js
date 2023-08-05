@@ -15,7 +15,7 @@ const Commentary = sequelize.define('Commentary', {
   },
 });
 
-Commentary.belongsTo(User, { foreignKey: 'userId' });
+Commentary.belongsTo(User, { foreignKey: 'authorId' });
 Commentary.belongsTo(Post, { foreignKey: 'postId' });
 
 module.exports = Commentary;

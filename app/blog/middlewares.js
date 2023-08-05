@@ -1,5 +1,6 @@
 const Post = require('./models/Post')
 const Story = require('./models/Story')
+const Commentary = require('./models/Commentary')
 const validatePost = (req, res, next) => {
     let errors = {};
 
@@ -32,6 +33,30 @@ const isPostAuthor = async (req, res, next) =>{
     else if(req.user.id === post.creatorId) next();
     else res.status(403).send({message: "Access forbidden"})
 }
+const isPostOrCommentAuthor = async (req, res, next) => {
+    const id = req.params.id || req.body.id;
+  
+    try {
+      const [post, comment] = await Promise.all([
+        Post.findByPk(id),
+        Commentary.findByPk(id),
+      ]);
+  
+      if (!post && !comment) {
+        return res.status(400).send({ message: "Post or comment with that id does not exist" });
+      }
+  
+      if (post && req.user.id === post.creatorId || comment && req.user.id === comment.authorId) {
+        return next();
+      }
+  
+      return res.status(403).send({ message: "Access forbidden" });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).send({ message: "Internal server error" });
+    }
+  };
+  
 const isStoryAuthor = async (req, res, next) =>{
     const id = req.params.id || req.body.id
 
@@ -45,5 +70,6 @@ module.exports = {
     validatePost,
     validateStory,
     isPostAuthor,
-    isStoryAuthor
+    isStoryAuthor,
+    isPostOrCommentAuthor
 }

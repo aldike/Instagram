@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const {createPost, getMyPosts, getAllPosts, getPost, deletePost, editPost, createStory, deleteStory, getUserStories, writeCommentary} = require('./controllers')
+const {createPost, getMyPosts, getAllPosts, getPost, deletePost, editPost, createStory, deleteStory, getUserStories, writeCommentary, deleteCommentary, getCommentsByPostId} = require('./controllers')
 const passport = require('passport');
-const {validatePost, validateStory, isPostAuthor, isStoryAuthor} = require('./middlewares')
+const {validatePost, validateStory, isPostAuthor, isStoryAuthor, isPostOrCommentAuthor} = require('./middlewares')
 
 
 router.post('/api/post', passport.authenticate('jwt', {session: false}), validatePost, createPost)
@@ -14,7 +14,8 @@ router.put('/api/post/:id', passport.authenticate('jwt', {session: false}), isPo
 router.post('/api/story', passport.authenticate('jwt', {session: false}), validateStory, createStory)
 router.delete('/api/story/:id', passport.authenticate('jwt', {session: false}), isStoryAuthor, deleteStory)
 router.get('/api/story/user/:id', passport.authenticate('jwt', {session: false}), getUserStories)
-router.post('/api/comment', passport.authenticate('jwt', {session: false}), writeCommentary)
-
+router.post('/api/comment/:id', passport.authenticate('jwt', {session: false}), writeCommentary)
+router.delete('/api/comment/:id', passport.authenticate('jwt', {session: false}), isPostOrCommentAuthor, deleteCommentary)
+router.get('/api/comment/post/:id', passport.authenticate('jwt', {session: false}), getCommentsByPostId)
 
 module.exports = router;
