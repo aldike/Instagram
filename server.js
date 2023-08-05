@@ -12,6 +12,7 @@ app.use(passport.initialize());
 app.use(require('./app/auth/routes'))
 app.use(require('./app/region/routes'))
 app.use(require('./app/blog/routes'))
+app.use(require('./app/followers/routes'))
 require('./app/utils/scheduler');
 
 app.listen(8000, () =>{
