@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../../../config/db');
 
 const Post = require('./Post');
-const User = require('./User');
+const User = require('../../auth/User');
 
 const Commentary = sequelize.define('Commentary', {
   authorId: {

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {createPost, getMyPosts, getAllPosts, getPost, deletePost, editPost, createStory, deleteStory, getUserStories} = require('./controllers')
+const {createPost, getMyPosts, getAllPosts, getPost, deletePost, editPost, createStory, deleteStory, getUserStories, writeCommentary} = require('./controllers')
 const passport = require('passport');
 const {validatePost, validateStory, isPostAuthor, isStoryAuthor} = require('./middlewares')
 
@@ -14,7 +14,7 @@ router.put('/api/post/:id', passport.authenticate('jwt', {session: false}), isPo
 router.post('/api/story', passport.authenticate('jwt', {session: false}), validateStory, createStory)
 router.delete('/api/story/:id', passport.authenticate('jwt', {session: false}), isStoryAuthor, deleteStory)
 router.get('/api/story/user/:id', passport.authenticate('jwt', {session: false}), getUserStories)
-
+router.post('/api/comment', passport.authenticate('jwt', {session: false}), writeCommentary)
 
 
 module.exports = router;

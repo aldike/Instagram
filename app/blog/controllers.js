@@ -1,6 +1,8 @@
 const Post = require('./models/Post')
 const MediaFile = require('./models/MediaFile');
 const Story = require('./models/Story')
+const Commentary = require('./models/Commentary')
+
 const createPost = async (req, res) => {
   try {
     const creatorId = req.user.id; // Use "creatorId" instead of "userId"
@@ -142,6 +144,23 @@ const getUserStories = async (req, res) => {
   }
 };
 
+const writeCommentary = async (req, res) => {
+  try {
+    const authorId = req.user.id;
+    const {commentary} = req.body;
+
+    const comment = await Commentary.create({
+      authorId: authorId,
+      commentary: commentary,
+    });
+
+    res.status(201).json(comment);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to write commentary' });
+  }
+};
+
 module.exports = {
     createPost,
     getMyPosts,
@@ -151,5 +170,6 @@ module.exports = {
     editPost,
     createStory,
     deleteStory,
-    getUserStories
+    getUserStories,
+    writeCommentary
 }
