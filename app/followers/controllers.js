@@ -1,4 +1,5 @@
 const Follow = require('./Follow')
+const User = require('../auth/User')
 
 const followUser = async (req, res) => {
   try {
@@ -51,9 +52,67 @@ const unFollowUser = async (req, res) => {
     res.status(500).json({ error: 'Failed to unfollow user' });
   }
 };
-
-
+const getFollowersByUsername = async (req, res) =>{
+  try {
+    const user = await User.findOne({
+      where: {
+        username: req.params.username
+      }
+    })
+    if(!user) res.status(201).send({message: "User with that username is not exist"})
+    else{
+      const followers = await Follow.findAll({
+        where: {
+          followedByUserId: user.id
+        }
+      })
+      if(followers.length > 0) res.status(200).send(followers)
+      
+      else res.status(201).send({message: "User has not any followers yet"})
+    }
+  } catch (error) {
+    res.status(500).send(error)
+  }
+}
+const getFollowsByUsername = async (req, res) =>{
+  try {
+    const user = await User.findOne({
+      where: {
+        username: req.params.username
+      }
+    })
+    if(!user) res.status(201).send({message: "User with that username is not exist"})
+    else{
+      const follows = await Follow.findAll({
+        where: {
+          followingUserId: user.id
+        }
+      })
+      if(follows.length > 0) res.status(200).send(follows)
+      
+      else res.status(201).send({message: "User has not any followers yet"})
+    }
+  } catch (error) {
+    res.status(500).send(error)
+  }
+}
+const getUserInfoByUsername = async (req, res) =>{
+  try {
+    const user = await User.findOne({
+      where: {
+        username: req.params.username
+      }
+    })
+    if(!user) res.status(201).send({message: "User with that username is not exist"})
+    else res.status(200).send({full_name : user.full_name, email: user.email, phone: user.phone})
+  } catch (error) {
+    res.status(500).send(error)
+  }
+}
 module.exports = {
   followUser,
-  unFollowUser
+  unFollowUser,
+  getFollowersByUsername,
+  getFollowsByUsername,
+  getUserInfoByUsername
 }

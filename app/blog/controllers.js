@@ -1,7 +1,8 @@
 const Post = require('./models/Post')
 const MediaFile = require('./models/MediaFile');
 const Story = require('./models/Story')
-const Commentary = require('./models/Commentary')
+const Commentary = require('./models/Commentary');
+const User = require('../auth/User');
 
 const createPost = async (req, res) => {
   try {
@@ -169,11 +170,35 @@ const deleteCommentary = async (req, res) =>{
   })
   res.status(200).end()
 }
+
 const getCommentsByPostId = async (req, res) =>{
   const post = await Post.findByPk(req.params.id)
   const comments = await Commentary.findAll({where: {postId: post.id}})
   res.status(200).send(comments)
 }
+const getPostsByUsername = async (req, res) =>{
+  try {
+    const user = await User.findOne({
+      where: {
+        username: req.params.username
+      }
+    })
+    if(!user) res.status(201).send({message: "User with that username is not exist"})
+    else{
+      const posts = await Post.findAll({
+        where: {
+          creatorId: user.id
+        }
+      })
+      if(posts.length > 0) res.status(200).send(posts)
+      
+      else res.status(201).send({message: "User didn't post anything yet"})
+    }
+  } catch (error) {
+    res.status(500).send(error)
+  }
+}
+
 module.exports = {
     createPost,
     getMyPosts,
@@ -186,5 +211,6 @@ module.exports = {
     getUserStories,
     writeCommentary,
     deleteCommentary,
-    getCommentsByPostId
+    getCommentsByPostId,
+    getPostsByUsername
 }
