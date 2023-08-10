@@ -3,7 +3,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const AuthCode = require('./AuthCode')
 const User = require('./User')
-const passport = require('../auth/passport');
 
 const sendVerificationEmail = async (req, res) => {
   const { email } = req.body;
@@ -27,9 +26,8 @@ const sendVerificationEmail = async (req, res) => {
 };
 
 const verifyCode = async (req, res) => {
-  const { email, code } = req.body;
-
   try {
+    const { email, code } = req.body;
     const authCode = await AuthCode.findOne({
       where: { email },
       order: [['valid_till', 'DESC']],
@@ -59,45 +57,31 @@ const verifyCode = async (req, res) => {
 };
 
 const createUsernamePassword = async (req, res) => {
-  passport.authenticate('jwt', { session: false }, async (err, user, info) => {
-    if (err) {
-      return res.status(500).json({ error: 'An error occurred while authenticating' });
+  try {
+    const user = await User.findByPk(req.user.id)
+    if(!user) return res.status(400).send({message: "User not found"})
+    const password = req.body.password
+    const hashedPassword = await bcrypt.hash(password, 10);
+    if(
+      !req.body.username
+      || req.body.username.length === 0
+      || !req.body.password
+      || req.body.password.length === 0
+      ) return res.status(400).json({ message: 'Username and password must be filled' })
+    else{
+      await user.update({
+        username: req.body.username,
+        password: hashedPassword
+      })
     }
-    if (!user) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-
-    const { username, password } = req.body;
-    const email = user.email;
-
-    if (!username || !password) {
-      return res.status(400).json({ error: 'Username and password are required' });
-    }
-
-    try {
-      let foundUser = await User.findOne({ where: { email } });
-
-      if (!foundUser) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-
-      foundUser.username = username;
-
-      const hashedPassword = await bcrypt.hash(password, 10);
-      foundUser.password = hashedPassword;
-
-      await foundUser.save();
-
-      res.status(200).json({ message: 'Username and password updated successfully' });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'An error occurred while updating the username and password' });
-    }
-  })
-  (req, res);
+    res.status(200).json({ message: 'Username and password updated successfully' });
+  } catch (error) {
+    res.status(500).send(error)
+  }
 };
 
 const loginUser = async (req, res) => {
+  try {
     const { email, password } = req.body;
   
     const user = await User.findOne({ where: { email } });
@@ -111,9 +95,12 @@ const loginUser = async (req, res) => {
     }
 
     res.status(200).json({ prompt: 'Authorization successful' });
-  };
+  } catch (error) {
+    res.status(500).send(error)
+  }
+};
 
-  const editUser = async (req, res) => {
+const editUser = async (req, res) => {
   try {
     const userId = req.user.id;
     const { full_name, email, phone, username} = req.body;
@@ -131,7 +118,6 @@ const loginUser = async (req, res) => {
         },
       }
     );
-
     res.status(200).end();
   } catch (error) {
     console.error(error);

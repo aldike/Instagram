@@ -19,5 +19,4 @@ router.delete('/api/comment/:id', passport.authenticate('jwt', {session: false})
 router.get('/api/comment/post/:id', passport.authenticate('jwt', {session: false}), getCommentsByPostId)
 router.get('/api/posts/byUsername/:username', passport.authenticate('jwt', {session: false}), getPostsByUsername)
 
-
 module.exports = router;

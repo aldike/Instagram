@@ -3,6 +3,7 @@ const MediaFile = require('./models/MediaFile');
 const Story = require('./models/Story')
 const Commentary = require('./models/Commentary');
 const User = require('../auth/User');
+const { Op } = require('sequelize');
 
 const createPost = async (req, res) => {
   try {
@@ -13,11 +14,9 @@ const createPost = async (req, res) => {
       creatorId: creatorId,
       description: description,
     });
-
-    // Create MediaFile entry for the newly created Post
     await MediaFile.create({
       postId: post.id,
-      link: media, // You can use the 'media' value as the link, adjust if needed
+      link: media,
     });
 
     res.status(201).json(post);
@@ -38,22 +37,34 @@ const getMyPosts = async (req, res) => {
 };
 
 const getAllPosts = async (req, res) =>{
-  const posts = await Post.findAll()
-  res.status(200).send(posts)
+  try {
+    const posts = await Post.findAll()
+    res.status(200).send(posts)
+  } catch (error) {
+    res.status(500).send(error)
+  }
 }
 
 const getPost = async (req, res) =>{
+  try {
     const post = await Post.findByPk(req.params.id)
     res.status(200).send(post)
+  } catch (error) {
+    res.status(500).send(error)
+  }
 }
 
 const deletePost = async (req, res) =>{
+  try {
     const data = await Post.destroy({
         where: {
             id: req.params.id
         }
     })
     res.status(200).end()
+  } catch (error) {
+    res.status(500).send(error)
+  }
 }
 
 const editPost = async (req, res) => {
@@ -99,7 +110,6 @@ const createStory = async (req, res) => {
     const creatorId = req.user.id;
     const { title, media} = req.body;
 
-    // Calculate the expiration time (24 hours from now)
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 24);
 
@@ -121,24 +131,39 @@ const createStory = async (req, res) => {
   }
 };
 const deleteStory = async (req, res) =>{
-  const data = await Story.destroy({
-      where: {
-          id: req.params.id
-      }
-  })
-  res.status(200).end()
+  try {
+    const data = await Story.destroy({
+        where: {
+            id: req.params.id
+        }
+    })
+    res.status(200).end()
+  } catch (error) {
+    res.status(500).send(error)
+  }
 }
 
 const getUserStories = async (req, res) => {
   try {
-    const userStories = await Story.findAll({ where: { creatorId: req.params.id } });
-    
-    // Create an array of storyIds from the userStories array
+    const userStories = await Story.findAll({
+      where: {
+        creatorId: req.params.id,
+        expiresAt: {
+          [Op.gt]: new Date()
+        }
+      }
+    });
     const storyIds = userStories.map(story => story.id);
-
-    // Use the array of storyIds in the query to get the corresponding media files
     const userStoryMedia = await MediaFile.findAll({ where: { storyId: storyIds } });
-    res.status(200).json({ userStories, userStoryMedia });
+
+    const storiesWithMediaLinks = userStories.map(story => {
+      return {
+        ...story.toJSON(),
+        mediaLinks: userStoryMedia.filter(media => media.storyId === story.id).map(media => media.link)
+      };
+    });
+
+    res.status(200).json(storiesWithMediaLinks);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to get users stories' });
@@ -163,18 +188,26 @@ const writeCommentary = async (req, res) => {
   }
 };
 const deleteCommentary = async (req, res) =>{
-  const data = await Commentary.destroy({
-      where: {
-          id: req.params.id
-      }
-  })
-  res.status(200).end()
+  try {
+    const data = await Commentary.destroy({
+        where: {
+            id: req.params.id
+        }
+    })
+    res.status(200).end()
+  } catch (error) {
+    res.status(500).send(error)
+  }
 }
 
 const getCommentsByPostId = async (req, res) =>{
-  const post = await Post.findByPk(req.params.id)
-  const comments = await Commentary.findAll({where: {postId: post.id}})
-  res.status(200).send(comments)
+  try {
+    const post = await Post.findByPk(req.params.id)
+    const comments = await Commentary.findAll({where: {postId: post.id}})
+    res.status(200).send(comments)
+  } catch (error) {
+    res.status(500).send(error)
+  }
 }
 const getPostsByUsername = async (req, res) =>{
   try {
