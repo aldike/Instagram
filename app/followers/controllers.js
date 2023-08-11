@@ -6,23 +6,28 @@ const followUser = async (req, res) => {
     const followingUserId = req.user.id;
     const followedByUserId = req.params.id;
 
+    const followedByUser = await User.findByPk(followedByUserId);
+    if (!followedByUser) {
+      return res.status(404).json({ error: 'User with that Id is not found' });
+    }
+
     const existingFollow = await Follow.findOne({
       where: {
         followingUserId: followingUserId,
         followedByUserId: followedByUserId,
       },
     });
-
-    if (existingFollow) {
+    if(existingFollow){
       return res.status(409).json({ error: 'User is already followed' });
+    }else if(Number(followingUserId) === Number(followedByUserId)){
+      return res.status(409).json({ error: 'You can not follow yourself' });
+    }else{
+      await Follow.create({
+        followingUserId: followingUserId,
+        followedByUserId: followedByUserId,
+      });
+      res.status(201).json({ message: 'User with that Id is successfully followed' });
     }
-
-    await Follow.create({
-      followingUserId: followingUserId,
-      followedByUserId: followedByUserId,
-    });
-
-    res.status(201).json({ message: 'User with that Id is successfully followed' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to follow User' });
@@ -109,10 +114,51 @@ const getUserInfoByUsername = async (req, res) =>{
     res.status(500).send(error)
   }
 }
+const getSuggestions = async (req, res) =>{
+  try {
+    const user = await User.findByPk(req.user.id)
+    const followedByMe = await Follow.findAll({
+      where: {
+        followingUserId: user.id
+      }
+    })
+    const myFollowers = await Follow.findAll({
+      where: {
+        followedByUserId: user.id
+      }
+    })
+    const idOfUsersIFollowed = followedByMe.map(item => item.followingUserId);
+    const idOfMyIFollowers = myFollowers.map(item => item.followingUserId);
+    const allIds = idOfUsersIFollowed.concat(idOfMyIFollowers)
+
+    const rows = await Follow.findAll({
+      where: {
+        followingUserId: allIds
+      },
+      limit: 1,
+      order: [['createdAt', 'DESC']]
+    });
+    const followedByUserIds = rows.map(row => row.followedByUserId);
+
+    // console.log('This is all follow ids:', JSON.stringify(allIds));
+    // console.log(followedByUserIds);
+
+    const users = await User.findAll({
+      where:{
+        id: followedByUserIds
+      }
+    })
+    res.status(200).send(users)
+  } catch (error) {
+    res.status(500).send(error)
+  }
+}
+
 module.exports = {
   followUser,
   unFollowUser,
   getFollowersByUsername,
   getFollowsByUsername,
-  getUserInfoByUsername
+  getUserInfoByUsername,
+  getSuggestions
 }
