@@ -3,14 +3,14 @@ const sequelize = require('../../config/db');
 const User = require('../auth/User');
 
 const Follow = sequelize.define('Follow', {
-  followingUserId: { // Changed to unique alias
+  followingUserId: {
     type: DataTypes.INTEGER,
     references: {
       model: 'Users',
       field: 'id',
     },
   },
-  followedByUserId: { // Changed to unique alias
+  followedByUserId: {
     type: DataTypes.INTEGER,
     references: {
       model: 'Users',

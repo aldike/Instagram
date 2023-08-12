@@ -1,5 +1,5 @@
-const Follow = require('./Follow')
-const User = require('../auth/User')
+const Follow = require('./Follow');
+const User = require('../auth/User');
 
 const followUser = async (req, res) => {
   try {
