@@ -7,6 +7,16 @@ module.exports = {
         dialect: 'postgres',
     },
     production: {
-        // конфигурация продакшн среды
+        username: 'doadmin',
+        password: 'AVNS_C6DNB8pUJZQj97hnRfI',
+        database: 'defaultdb',
+        host: 'db-postgresql-fra1-68266-do-user-14504070-0.b.db.ondigitalocean.com',
+        dialect: 'postgres',
+        port: 25060,
+        dialectOptions: {
+            ssl: {
+              ca: fs.readFileSync('config/ca-certificate.crt')
+            },
+        },
     },
 };

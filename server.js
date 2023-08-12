@@ -2,8 +2,10 @@ const express = require('express');
 const logger = require('morgan');
 const passport = require('./app/auth/passport');
 const app = express();
+cors = require('cors');
 
 app.use(logger('dev'));
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(passport.initialize());
