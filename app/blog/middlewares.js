@@ -7,8 +7,8 @@ const validatePost = (req, res, next) => {
 
     if(!req.body.description || req.body.description.length === 0)
         errors.description = "Описание не заполнено"
-    if(!req.body.media || req.body.media.length === 0)
-        errors.media = "Ссылка не заполнена"
+    if(!req.file.filename || req.file.filename.length === 0)
+        errors.file.filename = "Файл не загружен"
 
     if(JSON.stringify(errors) !== JSON.stringify({}))
         res.status(400).send(errors)
@@ -23,8 +23,8 @@ const validateStory = (req, res, next) => {
 
     if(!req.body.title || req.body.title.length === 0)
         errors.title = "Оглавление не заполнено"
-    if(!req.body.media || req.body.media.length === 0)
-        errors.media = "Ссылка не заполнена"
+    if(!req.file.filename || req.file.filename.length === 0)
+        errors.file.filename = "Файл не загружен"
 
     if(JSON.stringify(errors) !== JSON.stringify({}))
         res.status(400).send(errors)

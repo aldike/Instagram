@@ -4,19 +4,18 @@ const Story = require('./models/Story')
 const Commentary = require('./models/Commentary');
 const User = require('../auth/User');
 const { Op } = require('sequelize');
+const fs = require('fs');
+const path = require('path');
 
 const createPost = async (req, res) => {
   try {
-    const creatorId = req.user.id; // Use "creatorId" instead of "userId"
-    const { description, media} = req.body;
-
     const post = await Post.create({
-      creatorId: creatorId,
-      description: description,
+      creatorId: req.user.id,
+      description: req.body.description,
     });
     await MediaFile.create({
       postId: post.id,
-      link: media,
+      link: '/media/' + req.file.filename
     });
 
     res.status(201).json(post);
@@ -29,7 +28,16 @@ const createPost = async (req, res) => {
 const getMyPosts = async (req, res) => {
   try {
     const myPosts = await Post.findAll({ where: { creatorId: req.user.id } });
-    res.status(200).send(myPosts);
+    const postIds = myPosts.map(post => post.id);
+    const postMedia = await MediaFile.findAll({ where: { postId: postIds } });
+
+    const postWithMediaLinks = myPosts.map(post => {
+      return {
+        ...post.toJSON(),
+        mediaLinks: postMedia.filter(media => media.postId === post.id).map(media => media.link)
+      };
+    });
+    res.status(200).send(postWithMediaLinks);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to get posts' });
@@ -38,8 +46,17 @@ const getMyPosts = async (req, res) => {
 
 const getAllPosts = async (req, res) =>{
   try {
-    const posts = await Post.findAll()
-    res.status(200).send(posts)
+    const allposts = await Post.findAll();
+    const postIds = allposts.map(post => post.id);
+    const postMedia = await MediaFile.findAll({ where: { postId: postIds } });
+
+    const postWithMediaLinks = allposts.map(post => {
+      return {
+        ...post.toJSON(),
+        mediaLinks: postMedia.filter(media => media.postId === post.id).map(media => media.link)
+      };
+    });
+    res.status(200).send(postWithMediaLinks)
   } catch (error) {
     res.status(500).send(error)
   }
@@ -47,8 +64,15 @@ const getAllPosts = async (req, res) =>{
 
 const getPost = async (req, res) =>{
   try {
-    const post = await Post.findByPk(req.params.id)
-    res.status(200).send(post)
+    const postById = await Post.findByPk(req.params.id);
+    const postMedia = await MediaFile.findAll({ where: { postId: postById.id } });
+
+    const postWithMediaLink = {
+      ...postById.toJSON(),
+      mediaLinks: postMedia.map(media => media.link)
+    };
+
+    res.status(200).send(postWithMediaLink)
   } catch (error) {
     res.status(500).send(error)
   }
@@ -56,7 +80,7 @@ const getPost = async (req, res) =>{
 
 const deletePost = async (req, res) =>{
   try {
-    const data = await Post.destroy({
+    await Post.destroy({
         where: {
             id: req.params.id
         }
@@ -69,33 +93,25 @@ const deletePost = async (req, res) =>{
 
 const editPost = async (req, res) => {
   try {
-    const postId = req.params.id;
-    const { description, media } = req.body;
-
     await Post.update(
-      {
-        description: description,
-        media: media,
-      },
-      {
-        where: {
-          id: postId,
-        },
-      }
+      {description: req.body.description},
+      {where: {id: req.params.id}}
     );
 
-    const mediaFile = await MediaFile.findOne({ where: { postId: postId } });
+    const mediaFile = await MediaFile.findOne({ where: { postId: req.params.id } });
     if (mediaFile) {
-      await MediaFile.update(
-        {
-          link: media,
-        },
-        {
-          where: {
-            postId: postId,
-          },
-        }
-      );
+      const oldMediaFilePath = path.join(__dirname, '..', '..', 'public', 'media', path.basename(mediaFile.link));
+      fs.unlink(oldMediaFilePath, (err) => {
+        if (err) throw err;
+        console.log('Old media file deleted');
+      });
+      await mediaFile.update({
+        link: '/media/' + req.file.filename
+      });
+    }else{
+      await mediaFile.create({
+        link: '/media/' + req.file.filename
+      });
     }
 
     res.status(200).end();
@@ -107,21 +123,18 @@ const editPost = async (req, res) => {
 
 const createStory = async (req, res) => {
   try {
-    const creatorId = req.user.id;
-    const { title, media} = req.body;
-
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 24);
 
     const story = await Story.create({
-      creatorId: creatorId,
-      title: title,
+      creatorId: req.user.id,
+      title: req.body.title,
       expiresAt: expiresAt,
     });
 
     await MediaFile.create({
       storyId: story.id,
-      link: media,
+      link: '/media/' + req.file.filename,
     });
 
     res.status(201).json(story);
@@ -203,8 +216,16 @@ const deleteCommentary = async (req, res) =>{
 const getCommentsByPostId = async (req, res) =>{
   try {
     const post = await Post.findByPk(req.params.id)
-    const comments = await Commentary.findAll({where: {postId: post.id}})
-    res.status(200).send(comments)
+    if(!post){
+      return res.send({message: "Post with that Id is not found"})
+    }else{
+      const comments = await Commentary.findAll({where: {postId: post.id}})
+      if(!comments){
+        return res.send({message: "Post with that Id has no any comments yet"})
+      }else{
+        res.status(200).send(comments)
+      }
+    }
   } catch (error) {
     res.status(500).send(error)
   }
@@ -223,8 +244,18 @@ const getPostsByUsername = async (req, res) =>{
           creatorId: user.id
         }
       })
-      if(posts.length > 0) res.status(200).send(posts)
-      
+      if(posts.length > 0){
+        const postIds = posts.map(post => post.id);
+        const postMedia = await MediaFile.findAll({ where: { postId: postIds } });
+
+        const postWithMediaLinks = posts.map(post => {
+          return {
+            ...post.toJSON(),
+            mediaLinks: postMedia.filter(media => media.postId === post.id).map(media => media.link)
+          };
+        });
+        res.status(200).send(postWithMediaLinks)
+      } 
       else res.status(201).send({message: "User didn't post anything yet"})
     }
   } catch (error) {
