@@ -137,7 +137,7 @@ const getSuggestions = async (req, res) =>{
 
 
 
-    console.log('filteredIds:', JSON.stringify(filteredIds));
+
     const rows = await Follow.findAll({
       where: {
         followingUserId: allIds
@@ -146,8 +146,8 @@ const getSuggestions = async (req, res) =>{
       order: [['createdAt', 'DESC']]
     });
     const filteredIds = rows.filter(id => id !== user.id && !idFromUsersIFollowed.includes(id));
-    
-    const lastFiveUniqueIds = [...new Set(rows.map(row => row.followedByUserId))].slice(0, 5);
+    console.log('filteredIds:', JSON.stringify(filteredIds));
+    const lastFiveUniqueIds = [...new Set(filteredIds.map(row => row.followedByUserId))].slice(0, 5);
     console.log('lastFiveUniqueIds:', lastFiveUniqueIds);
 
     const users = await User.findAll({
