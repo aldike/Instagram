@@ -127,30 +127,18 @@ const getSuggestions = async (req, res) =>{
         followedByUserId: user.id
       }
     })
-    const idFromUsersIFollowed = followedByMe.map(item => item.followingUserId);
-    const idFromMyFollowers = myFollowers.map(item => item.followingUserId);
+    const idFromUsersIFollowed = followedByMe.map(item => item.followedByUserId);
+    const idFromMyFollowers = myFollowers.map(item => item.followedByUserId);
     const allIds = [...new Set([...idFromUsersIFollowed, ...idFromMyFollowers])];
     const filteredIds = allIds.filter(id => id !== user.id && !idFromUsersIFollowed.includes(id));
-
-    const suggestedUsers = await User.findAll({
-      include: {
-        model: Follow,
-        where: {
-          followingUserId: filteredIds,
-        },
+    
+    const rows = await Follow.findAll({
+      where: {
+        followingUserId: filteredIds
       },
-      order: [[{ model: Follow }, 'createdAt', 'DESC']],
       limit: 5,
+      order: [['createdAt', 'DESC']]
     });
-
-    res.status(200).send(suggestedUsers);
-
-    // const rows = await Follow.findAll({
-    //   where: {
-    //     followingUserId: filteredIds
-    //   },
-    //   order: [['createdAt', 'DESC']]
-    // });
 
     // const lastFiveUniqueIds = [...new Set(rows.map(row => row.followedByUserId))].slice(0, 5);
 
@@ -158,12 +146,13 @@ const getSuggestions = async (req, res) =>{
     // console.log(lastFiveUniqueIds);
 
 
-    // const users = await User.findAll({
-    //   where:{
-    //     id: lastFiveUniqueIds
-    //   }
-    // })
-    // res.status(200).send(users)
+    const users = await User.findAll({
+      where:{
+        // id: lastFiveUniqueIds
+        id: rows
+      }
+    })
+    res.status(200).send(users)
   } catch (error) {
     res.status(500).send(error)
   }
