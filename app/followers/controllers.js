@@ -129,7 +129,7 @@ const getSuggestions = async (req, res) =>{
       }
     })
     console.log('myFollowers:', myFollowers);
-    const idFromUsersIFollowed = followedByMe.map(item => item.followingUserId);
+    const idFromUsersIFollowed = followedByMe.map(item => item.followedByUserId);
     const idFromMyFollowers = myFollowers.map(item => item.followedByUserId);
     const allIds = [...new Set([...idFromUsersIFollowed, ...idFromMyFollowers])];
     
