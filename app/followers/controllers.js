@@ -122,13 +122,13 @@ const getSuggestions = async (req, res) =>{
         followingUserId: user.id
       }
     })
-    console.log('followedByMe:', JSON(followedByMe));
+    console.log('followedByMe:', [followedByMe]);
     const myFollowers = await Follow.findAll({
       where: {
         followedByUserId: user.id
       }
     })
-    console.log('myFollowers:', JSON(myFollowers));
+    console.log('myFollowers:', [myFollowers]);
     const idFromUsersIFollowed = followedByMe.map(item => item.followedByUserId);
     const idFromMyFollowers = myFollowers.map(item => item.followedByUserId);
     const allIds = [...new Set([...idFromUsersIFollowed, ...idFromMyFollowers])];
