@@ -127,7 +127,7 @@ const getSuggestions = async (req, res) =>{
         followedByUserId: user.id
       }
     })
-    const idFromUsersIFollowed = followedByMe.map(item => item.followingUserId);
+    const idFromUsersIFollowed = followedByMe.map(item => item.followedByUserId);
     console.log('idFromUsersIFollowed:', idFromUsersIFollowed);
     const idFromMyFollowers = myFollowers.map(item => item.followingUserId);
     console.log('idFromMyFollowers:', idFromMyFollowers);
