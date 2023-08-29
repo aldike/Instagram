@@ -108,7 +108,7 @@ const editUser = async (req, res) => {
     await User.update(
       {
         full_name: full_name,
-        email:  email,
+        email: email,
         phone: phone,
         username: username
       },
