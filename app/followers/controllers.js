@@ -151,8 +151,7 @@ const getSuggestions = async (req, res) =>{
     const idFromRows = rows.map(item => item.followedByUserId);
     console.log('idFromRows:', JSON.stringify(idFromRows));
 
-    const filteredIds = idFromRows.filter(id => id !== user.id && !idFromUsersIFollowed.includes(id));
-    console.log('filteredIds:', JSON.stringify(filteredIds));
+    const filteredIds = [...new Set(idFromRows.filter(id => id !== user.id && !idFromUsersIFollowed.includes(id)))];    console.log('filteredIds:', JSON.stringify(filteredIds));
 
     const lastFiveUniqueIds = filteredIds.length >= 5 ? filteredIds.slice(0, 5) : filteredIds;    console.log('lastFiveUniqueIds:', lastFiveUniqueIds);
 
