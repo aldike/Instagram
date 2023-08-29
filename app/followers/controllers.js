@@ -130,8 +130,7 @@ const getSuggestions = async (req, res) =>{
     const idFromUsersIFollowed = followedByMe.map(item => item.followingUserId);
     const idFromMyFollowers = myFollowers.map(item => item.followingUserId);
     const allIds = [...new Set([...idFromUsersIFollowed, ...idFromMyFollowers])];
-    const filteredIds = allIds.filter(id => id !== user.id && !idFromUsersIFollowed.includes(id));
-
+    const filteredIds = allIds.filter(id => id !== user.id && !idFromUsersIFollowed.includes(id) && !idFromMyFollowers.includes(id));
     const rows = await Follow.findAll({
       where: {
         followingUserId: filteredIds
