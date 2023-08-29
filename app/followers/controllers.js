@@ -140,16 +140,15 @@ const getSuggestions = async (req, res) =>{
       order: [['createdAt', 'DESC']]
     });
 
-    // const lastFiveUniqueIds = [...new Set(rows.map(row => row.followedByUserId))].slice(0, 5);
+    const lastFiveUniqueIds = [...new Set(rows.map(row => row.followedByUserId))]
 
-    // console.log('This is all follow ids:', JSON.stringify(allIds));
-    // console.log(lastFiveUniqueIds);
+    console.log('This is all follow ids:', JSON.stringify(filteredIds));
+    console.log(lastFiveUniqueIds);
 
 
     const users = await User.findAll({
       where:{
-        // id: lastFiveUniqueIds
-        id: rows
+        id: lastFiveUniqueIds
       }
     })
     res.status(200).send(users)
